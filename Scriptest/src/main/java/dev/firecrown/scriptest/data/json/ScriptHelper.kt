@@ -11,7 +11,7 @@ import dev.firecrown.scriptest.data.entities.ScriptEntity
 import dev.firecrown.scriptest.data.repositories.BlockRepository.scriptName
 import java.io.File
 
-internal class ScriptHelper(val context: Context) {
+internal class ScriptHelper() {
 
     private val gson = Gson()
 
