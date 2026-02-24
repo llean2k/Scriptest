@@ -27,6 +27,12 @@ class ScriptestService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val foregroundId = intent
+            ?.getIntExtra("foregroundId", 0)
+
+        if(foregroundId != null && foregroundId != 0)
+            startForeground(foregroundId, createNotification())
+
         BlockRepository.isScriptRunning.value = true
 
         val script = ScriptHelper()
@@ -37,6 +43,7 @@ class ScriptestService: Service() {
             intent
                 ?.getStringExtra("output")?:"DEFAULT"
         )
+
         BlockRepository.scriptName.value = script.name
 
         Script(this).execute(
@@ -47,7 +54,8 @@ class ScriptestService: Service() {
         CoroutineScope(Dispatchers.Main).launch {
             BlockRepository.isScriptRunning.collect {
                 if(it != null && !it){
-                    stopForeground(true)
+                    if(foregroundId != null && foregroundId != 0)
+                        stopForeground(true)
                     stopSelf()
                     cancel()
                 }
@@ -55,11 +63,6 @@ class ScriptestService: Service() {
         }
 
         return START_STICKY
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        startForeground(67, createNotification())
     }
 
     private fun createNotification(): Notification {

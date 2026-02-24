@@ -1,7 +1,6 @@
 package dev.firecrown.scriptest.data.entities
 
 import android.os.Parcelable
-import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.parcelize.Parcelize
 
 internal data class ResultEntity(

@@ -21,12 +21,16 @@ class Scriptest(
     suspend operator fun invoke(
         script: String,
         output: Output,
+        foregroundId: Int? = null
 
     ): String {
         context
             .startService(Intent(context, ScriptestService::class.java).apply {
                 putExtra("script", script)
                 putExtra("output", output.name)
+
+                if(foregroundId != null)
+                    putExtra("foregroundId", foregroundId)
             })
 
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
