@@ -2,6 +2,7 @@ package dev.firecrown.scriptest.core
 
 import android.content.Context
 import android.util.Log
+import dev.firecrown.scriptest.data.db.Db
 import dev.firecrown.scriptest.data.entities.ResultEntity
 import dev.firecrown.scriptest.data.entities.BlockEntity
 import dev.firecrown.scriptest.data.entities.Output
@@ -20,7 +21,7 @@ internal class Script(
     val context: Context
 ) {
 
-    private suspend fun processBlock(blockEntity: BlockEntity): ResultEntity {
+    private suspend fun processBlock(blockEntity: BlockEntity) {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         BlockRepository.apply {
             isBlockExecuting.value = true
@@ -36,12 +37,14 @@ internal class Script(
 
             isBlockExecuting.first { !it }
 
-            return ResultEntity(
-                textField = textFiledTypedText.value,
-                snapshot = snapshot.value,
-                option = option.value,
-                exceptionMessage = null,
-                timestamp = sdf.format(Date())
+            Db(context).insertResultBlock(
+                ResultEntity(
+                    textField = if(textField.value != null && textField.value != "") textFiledTypedText.value else null,
+                    snapshot = snapshot.value,
+                    option = option.value,
+                    exceptionMessage = null,
+                    timestamp = sdf.format(Date())
+                )
             )
         }
     }
@@ -52,10 +55,10 @@ internal class Script(
     ){
         CoroutineScope(Dispatchers.IO).apply {
             val script = async {
-                //val filtered = scriptText.filter { it != null }
+                //Db(context).dropTable()
+
                 scriptText.forEach { scriptEntity ->
-                    val processBlock = processBlock(scriptEntity)
-                    BlockRepository.resultList.value.add(processBlock)
+                    processBlock(scriptEntity)
                     BlockRepository.setDefaultValues()
                 }
 
@@ -66,9 +69,13 @@ internal class Script(
                 }
 
             }
+
             launch {
                 script.await()
                 BlockRepository.isScriptRunning.value = false
+                Log.d("Scriptest", "Script finished")
+//                Db(context)
+//                    .deleteTable()
                 cancel()
             }
         }

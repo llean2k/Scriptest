@@ -9,12 +9,14 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import dev.firecrown.scriptest.core.Script
+import dev.firecrown.scriptest.data.db.Db
 import dev.firecrown.scriptest.data.entities.Output
 import dev.firecrown.scriptest.data.json.ScriptHelper
 import dev.firecrown.scriptest.data.repositories.BlockRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ScriptestService: Service() {
@@ -34,15 +36,20 @@ class ScriptestService: Service() {
             startForeground(foregroundId, createNotification())
 
         BlockRepository.isScriptRunning.value = true
+        BlockRepository.isOverlayVisible.value = true
 
         val script = ScriptHelper()
             .parseScript(intent?.getStringExtra("script")?:"")
+
 
 
         val output = Output.valueOf(
             intent
                 ?.getStringExtra("output")?:"DEFAULT"
         )
+
+        Db(this)
+            .deleteTable()
 
         BlockRepository.scriptName.value = script.name
 
@@ -53,15 +60,20 @@ class ScriptestService: Service() {
 
         CoroutineScope(Dispatchers.Main).launch {
             BlockRepository.isScriptRunning.collect {
+                Log.d("Scriptest", "Stopping service collect $it")
                 if(it != null && !it){
-                    if(foregroundId != null && foregroundId != 0)
+                    Log.d("Scriptest", "Stopping service")
+                    //Db(this@ScriptestService).dropTable()
+                    if(foregroundId != null && foregroundId != 0){
+                        Log.d("Scriptest", "Stopping foreground service")
                         stopForeground(true)
+                    }
+                    BlockRepository.isScriptRunning.value = null
                     stopSelf()
                     cancel()
                 }
             }
         }
-
         return START_STICKY
     }
 

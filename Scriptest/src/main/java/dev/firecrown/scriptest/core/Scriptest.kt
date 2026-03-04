@@ -1,8 +1,10 @@
 package dev.firecrown.scriptest.core
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import dev.firecrown.scriptest.data.db.Db
 import dev.firecrown.scriptest.data.entities.Output
 import dev.firecrown.scriptest.data.entities.ResultEntity
 import dev.firecrown.scriptest.data.json.ScriptHelper
@@ -11,7 +13,11 @@ import dev.firecrown.scriptest.data.repositories.BlockRepository
 import dev.firecrown.scriptest.services.ScriptestService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -24,6 +30,10 @@ class Scriptest(
         foregroundId: Int? = null
 
     ): String {
+
+
+        BlockRepository.isScriptRunning.value = false
+
         context
             .startService(Intent(context, ScriptestService::class.java).apply {
                 putExtra("script", script)
@@ -36,29 +46,22 @@ class Scriptest(
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             BlockRepository.apply {
-                resultList.value.add(
+                Db(context).insertResultBlock(
                     ResultEntity(
-                        textField = textField.value,
+                        textField = if(textField.value != null) textFiledTypedText.value else null,
                         snapshot = snapshot.value,
                         option = option.value,
                         exceptionMessage = throwable.stackTraceToString(),
                         timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
                     )
                 )
+
                 OutputScript(context).file()
                 defaultHandler?.uncaughtException(thread, throwable)
             }
         }
 
-        BlockRepository.isScriptRunning.first{it != null && !it}
-        BlockRepository.isScriptRunning.value = null
-
-        Log.d("ScriptTest", TestLog.logArray.toString())
-
-        return ScriptHelper().createResult(
-            BlockRepository.resultList.value,
-            TestLog.logArray,
-            BlockRepository.scriptName.value
-        )
+        BlockRepository.isScriptRunning.first{it == null}
+        return Db(context).getResult()
     }
 }

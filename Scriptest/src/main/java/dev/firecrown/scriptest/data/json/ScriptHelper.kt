@@ -18,18 +18,4 @@ internal class ScriptHelper() {
     fun parseScript(script: String): ScriptEntity {
         return gson.fromJson(script, ScriptEntity::class.java)
     }
-
-    fun createResult(
-        resultList: List<ResultEntity>,
-        logsList: List<LogEntity>,
-        name: String
-    ): String {
-        val result = mapOf(
-            "name" to name,
-            "result" to resultList,
-            "logs" to logsList
-        )
-        return gson.toJson(result)
-    }
-
 }

@@ -39,55 +39,56 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.apply {
-            val scriptest = async {
-                return@async Scriptest(this@MainActivity)(
-                    script = "{\n" +
-                            "  \"name\": \"test1\",\n" +
-                            "  \"script\": [\n" +
-                            "    {\n" +
-                            "      \"title\": \"Тест\",\n" +
-                            "      \"text\": \"Нормально?\",\n" +
-                            "      \"dialogOverlayPosition\": \"Bottom\",\n" +
-                            "      \"textField\": null,\n" +
-                            "      \"pointer\": [0.3, 0.2, 0.3, 0.5],\n" +
-                            "      \"options\": [\"Да\", \"Нет\"],\n" +
-                            "      \"snapshot\": false\n" +
-                            "    },\n" +
-                            "    {\n" +
-                            "      \"title\": \"Тест2\",\n" +
-                            "      \"text\": \"Точно Нормально?\",\n" +
-                            "      \"dialogOverlayPosition\": \"Center\",\n" +
-                            "      \"textField\": \"Введите количество ваших хромосом\",\n" +
-                            "      \"pointer\": [0.5, 0.2, 0.8, 0.1],\n" +
-                            "      \"options\": [\"Ну Да\", \"Неееет\"],\n" +
-                            "      \"snapshot\": true\n" +
-                            "    },\n" +
-                            "    {\n" +
-                            "      \"title\": \"Тест3\",\n" +
-                            "      \"text\": \"Не бро ты уровен что все реально нормально???\",\n" +
-                            "      \"dialogOverlayPosition\": \"Сenter\",\n" +
-                            "      \"textField\": \"Мнение на счет Джон Гарика\",\n" +
-                            "      \"pointer\": [0.3, 0.2, 0.3, 0.5],\n" +
-                            "      \"snapshot\": false\n" +
-                            "    }\n" +
-                            "  ]\n" +
-                            "}",
-                    output = Output.SAVE
-                )
-            }
-            launch {
-                scriptest.await()
-                Log.d("Scriptest", scriptest.await())
-            }
-        }
+
 
         enableEdgeToEdge()
         setContent {
             ScriptestOverlay {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                     Button({
-                        TestLog.info("test1", "Log is work")
+                        lifecycleScope.apply {
+                            val scriptest = async {
+                                return@async Scriptest(this@MainActivity)(
+                                    script = "{\n" +
+                                            "  \"name\": \"test1\",\n" +
+                                            "  \"script\": [\n" +
+                                            "    {\n" +
+                                            "      \"title\": \"Тест\",\n" +
+                                            "      \"text\": \"Нормально?\",\n" +
+                                            "      \"dialogOverlayPosition\": \"Bottom\",\n" +
+                                            "      \"textField\": null,\n" +
+                                            "      \"pointer\": [0.3, 0.2, 0.3, 0.5],\n" +
+                                            "      \"options\": [\"Да\", \"Нет\"],\n" +
+                                            "      \"snapshot\": false\n" +
+                                            "    },\n" +
+                                            "    {\n" +
+                                            "      \"title\": \"Тест2\",\n" +
+                                            "      \"text\": \"Точно Нормально?\",\n" +
+                                            "      \"dialogOverlayPosition\": \"Center\",\n" +
+                                            "      \"textField\": \"Введите количество ваших хромосом\",\n" +
+                                            "      \"pointer\": [0.5, 0.2, 0.8, 0.1],\n" +
+                                            "      \"options\": [\"Ну Да\", \"Неееет\"],\n" +
+                                            "      \"snapshot\": false\n" +
+                                            "    },\n" +
+                                            "    {\n" +
+                                            "      \"title\": \"Тест3\",\n" +
+                                            "      \"text\": \"Не бро ты уровен что все реально нормально???\",\n" +
+                                            "      \"dialogOverlayPosition\": \"Сenter\",\n" +
+                                            "      \"textField\": \"Мнение на счет Джон Гарика\",\n" +
+                                            "      \"pointer\": [0.3, 0.2, 0.3, 0.5],\n" +
+                                            "      \"snapshot\": false\n" +
+                                            "    }\n" +
+                                            "  ]\n" +
+                                            "}",
+                                    output = Output.SAVE,
+                                    foregroundId = 67
+                                )
+                            }
+                            launch {
+                                scriptest.await()
+                                Log.d("Scriptest", scriptest.await())
+                            }
+                        }
                     }) {
                         Text("Test")
                     }

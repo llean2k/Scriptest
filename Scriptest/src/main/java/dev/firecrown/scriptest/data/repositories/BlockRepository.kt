@@ -13,10 +13,10 @@ internal object BlockRepository {
     val snapshot = MutableStateFlow<String?>(null)
     val isBlockExecuting = MutableStateFlow(false)
     val scriptName = MutableStateFlow<String>("")
-    val resultList = MutableStateFlow<ArrayList<ResultEntity>>(arrayListOf())
     val isScriptRunning = MutableStateFlow<Boolean?>(null)
     val dialogOverlayPosition = MutableStateFlow("Center")
     val textFiledTypedText = MutableStateFlow<String>("")
+    val isOverlayVisible = MutableStateFlow(false)
 
     fun setDefaultValues() {
         title.value = "Text"
